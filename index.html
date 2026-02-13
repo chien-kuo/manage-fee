@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Noto Sans TC', sans-serif; background: linear-gradient(135deg, #FFF5E6 0%, #FFE4CC 100%); min-height: 100vh; }
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         /* 用於中間進度條的平滑過渡效果 */
@@ -31,13 +31,13 @@
     <script type="text/babel">
         // --- 1. 初始化 Firebase ---
         const firebaseConfig = {
-          apiKey: "AIzaSyBzo23Bb1cAhAwLsdq-BtSyQlpnAX5teKw",
-          authDomain: "houseopinionapp.firebaseapp.com",
-          projectId: "houseopinionapp",
-          storageBucket: "houseopinionapp.firebasestorage.app",
-          messagingSenderId: "80672201264",
-          appId: "1:80672201264:web:ab183de27b1583e6cb6bf5",
-          measurementId: "G-KBFD5VZTZD"
+        apiKey: "AIzaSyAFJvwn-ttdZDiur8Cc3D_E9CYKqsyiRzc",
+        authDomain: "managefee-75a69.firebaseapp.com",
+        projectId: "managefee-75a69",
+        storageBucket: "managefee-75a69.firebasestorage.app",
+        messagingSenderId: "852226653574",
+        appId: "1:852226653574:web:981de133703547cbefc007",
+        measurementId: "G-D7X4BVYF0R"
         };
         
         if (!firebase.apps.length) {
@@ -78,43 +78,43 @@
             const [selectedHour, setSelectedHour] = React.useState(new Date().getHours());
             const [selectedMinute, setSelectedMinute] = React.useState(new Date().getMinutes());
             
-            // 計算可選的月份選項（當月和上月）- 降冪排列
+            // 計算可選的月份選項（當月和上月）- 升冪排列
             const getMonthOptions = () => {
                 const currentMonth = new Date().getMonth() + 1;
                 const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
-                return [currentMonth, lastMonth]; // 當月在前
+                return [lastMonth, currentMonth]; // 上月在前，當月在後
             };
             
-            // 計算可選的日期選項（當日至前五日）- 降冪排列
+            // 計算可選的日期選項（當日至前五日）- 升冪排列
             const getDayOptions = () => {
                 const currentDay = new Date().getDate();
                 const options = [];
-                for (let i = 0; i <= 5; i++) {
+                for (let i = 5; i >= 0; i--) {
                     const day = currentDay - i;
                     if (day > 0) {
                         options.push(day);
                     }
                 }
-                return options; // 已經是降冪：當日、昨日、前日...
+                return options; // 升冪：前五日、前四日...、當日
             };
             
-            // 計算可選的小時選項（當前時間往前6小時）- 降冪排列
+            // 計算可選的小時選項（當前時間往前6小時）- 升冪排列
             const getHourOptions = () => {
                 const currentHour = new Date().getHours();
                 const options = [];
-                for (let i = 0; i <= 6; i++) {
+                for (let i = 6; i >= 0; i--) {
                     const hour = currentHour - i;
                     if (hour >= 0) {
                         options.push(hour);
                     }
                 }
-                return options; // 已經是降冪：當前小時、1小時前、2小時前...
+                return options; // 升冪：6小時前、5小時前...、當前小時
             };
             
-            // 計算可選的分鐘選項（59分至1分）- 降冪排列
+            // 計算可選的分鐘選項（1分至59分）- 升冪排列
             const getMinuteOptions = () => {
                 const options = [];
-                for (let i = 59; i >= 1; i--) {
+                for (let i = 1; i <= 59; i++) {
                     options.push(i);
                 }
                 return options;
@@ -385,7 +385,7 @@
                 return (
                     <div className={`${heightClass} mb-1 flex items-center justify-center text-sm font-bold rounded border transition-colors duration-300
                         ${isDone 
-                            ? 'bg-blue-600 text-white border-blue-700 shadow-sm' 
+                            ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-orange-600 shadow-sm' 
                             : 'bg-white text-gray-400 border-gray-200'}`}
                     >
                         {houseNum}
@@ -471,14 +471,14 @@
                     )}
 
                     {/* Header */}
-                    <header className="bg-blue-800 text-white shadow-lg">
+                    <header className="bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg">
                         <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
                             <h1 className="text-xl md:text-2xl font-bold flex items-center">
                                 <i className="fas fa-city mr-3"></i>管理費匯整
                             </h1>
                             <button 
                                 onClick={() => isAdmin ? handleLogout() : setShowAdminLogin(true)}
-                                className={`text-sm px-4 py-2 rounded transition ${isAdmin ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-700 hover:bg-blue-600 border border-blue-400'}`}
+                                className={`text-sm px-4 py-2 rounded transition ${isAdmin ? 'bg-red-500 hover:bg-red-600' : 'bg-orange-600 hover:bg-orange-700 border border-orange-300'}`}
                             >
                                 <i className={`fas ${isAdmin ? 'fa-sign-out-alt' : 'fa-user-shield'} mr-2`}></i>
                                 {isAdmin ? '登出管理' : '管理者後台'}
@@ -492,7 +492,7 @@
                         {isAdmin && (
                             <div className="space-y-6 fade-in">
                                 {/* Action Buttons */}
-                                <div className="bg-white border-l-4 border-yellow-500 rounded shadow p-4 flex flex-wrap justify-between items-center gap-4">
+                                <div className="bg-white border-l-4 border-orange-500 rounded shadow p-4 flex flex-wrap justify-between items-center gap-4">
                                     <h2 className="font-bold text-gray-800">
                                         <i className="fas fa-tools mr-2"></i>後台操作 ({user ? user.email : 'Admin'})
                                     </h2>
@@ -502,7 +502,7 @@
                                             disabled={dataList.length === 0}
                                             title="匯出 CSV"
                                             aria-label="匯出 CSV"
-                                            className="bg-green-600 text-white w-11 h-10 flex items-center justify-center rounded hover:bg-green-700 disabled:opacity-50 shadow"
+                                            className="bg-emerald-600 text-white w-11 h-10 flex items-center justify-center rounded hover:bg-emerald-700 disabled:opacity-50 shadow"
                                         >
                                             <i className="fas fa-file-csv"></i>
                                             <span className="sr-only">匯出 CSV</span>
@@ -513,7 +513,7 @@
                                             disabled={dataList.length === 0}
                                             title="匯出 PDF"
                                             aria-label="匯出 PDF"
-                                            className="bg-blue-600 text-white w-11 h-10 flex items-center justify-center rounded hover:bg-blue-700 disabled:opacity-50 shadow"
+                                            className="bg-orange-600 text-white w-11 h-10 flex items-center justify-center rounded hover:bg-orange-700 disabled:opacity-50 shadow"
                                         >
                                             <i className="fas fa-file-pdf"></i>
                                             <span className="sr-only">匯出 PDF</span>
@@ -561,58 +561,6 @@
                                             </button>
                                     </div>
                                 </div>
-
-                                {/* Status Visualizer Map (Top-Aligned) */}
-                                <div className="bg-white rounded shadow-lg p-6">
-                                    <h3 className="font-bold text-gray-700 mb-4 border-b pb-2">填寫進度總覽</h3>
-                                    
-                                    <div className="flex justify-center">
-                                        {/* Container for the 3 columns, height is now determined by the house cells */}
-                                        <div className="flex gap-1 p-2 bg-gray-100 rounded-lg border border-gray-300">
-                                            
-                                            {/* Left Column (Odd Numbers) */}
-                                            <div className="w-16 flex flex-col">
-                                                {/* Header (mb-1 matches cell spacing) */}
-                                                <div className="h-8 mb-1 bg-gray-300 text-gray-700 font-bold flex items-center justify-center rounded text-sm shrink-0">A區</div>
-                                                {/* Cells (default top-to-bottom stacking) */}
-                                                {ODD_HOUSES.map(n => (
-                                                    <StatusCell key={`odd-${n}`} houseNum={n} />
-                                                ))}
-                                            </div>
-
-                                            {/* Middle Column (Even Numbers) */}
-                                            <div className="w-16 flex flex-col">
-                                                {/* Header (mb-1 matches cell spacing) */}
-                                                <div className="h-8 mb-1 bg-gray-300 text-gray-700 font-bold flex items-center justify-center rounded text-sm shrink-0">B區</div>
-                                                {/* Cells (default top-to-bottom stacking) */}
-                                                {EVEN_HOUSES.map(n => (
-                                                    <StatusCell key={`even-${n}`} houseNum={n} />
-                                                ))}
-                                            </div>
-
-                                            {/* Right Column (Progress Bar) */}
-                                            <div className="w-20 flex flex-col relative bg-gray-200 rounded overflow-hidden border border-gray-300 mx-1">
-                                                {/* Header Text - stick to top, but inside this flow */}
-                                                <div className="h-8 mb-1 sticky top-0 w-full z-10 flex items-center justify-center font-bold text-gray-800 bg-white/50 backdrop-blur-sm border-b border-gray-300 text-sm shrink-0">
-                                                    {progressPercentage}%
-                                                </div>
-                                                
-                                                {/* Background Track - must fill the same total height as the house cells */}
-                                                <div className="relative w-full flex-grow">
-                                                    {/* Foreground Fill (Green) */}
-                                                    <div 
-                                                        className="absolute bottom-0 w-full bg-gradient-to-t from-green-500 to-green-400 progress-bar-fill shadow-[0_0_10px_rgba(74,222,128,0.5)]"
-                                                        style={{ height: `${progressPercentage}%` }}
-                                                    ></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="text-center mt-3 text-xs text-gray-500">
-                                        <span className="inline-block w-3 h-3 bg-blue-600 rounded mr-1 align-middle"></span>已完成
-                                        <span className="inline-block w-3 h-3 bg-white border border-gray-300 rounded ml-3 mr-1 align-middle"></span>未填寫
-                                    </div>
-                                </div>
                             </div>
                         )}
 
@@ -629,7 +577,7 @@
                                                     <select 
                                                         value={selectedHouse}
                                                         onChange={(e) => setSelectedHouse(e.target.value)}
-                                                        className="w-full border border-gray-300 rounded p-3 appearance-none bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                                                        className="w-full border border-gray-300 rounded p-3 appearance-none bg-orange-50 focus:outline-none focus:border-orange-500 focus:bg-white transition"
                                                     >
                                                         {HOUSE_NUMBERS.map(n => <option key={n} value={n}>{n} 號</option>)}
                                                     </select>
@@ -644,7 +592,7 @@
                                                         <select 
                                                             value={selectedMonth}
                                                             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                                                            className="flex-1 border border-gray-300 rounded p-3 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                                                            className="flex-1 border border-gray-300 rounded p-3 bg-orange-50 focus:outline-none focus:border-orange-500 focus:bg-white transition"
                                                         >
                                                             {getMonthOptions().map(m => <option key={m} value={m}>{m}</option>)}
                                                         </select>
@@ -653,7 +601,7 @@
                                                         <select 
                                                             value={selectedDay}
                                                             onChange={(e) => setSelectedDay(parseInt(e.target.value))}
-                                                            className="flex-1 border border-gray-300 rounded p-3 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                                                            className="flex-1 border border-gray-300 rounded p-3 bg-orange-50 focus:outline-none focus:border-orange-500 focus:bg-white transition"
                                                         >
                                                             {getDayOptions().map(d => <option key={d} value={d}>{d}</option>)}
                                                         </select>
@@ -665,7 +613,7 @@
                                                         <select 
                                                             value={selectedHour}
                                                             onChange={(e) => setSelectedHour(parseInt(e.target.value))}
-                                                            className="flex-1 border border-gray-300 rounded p-3 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                                                            className="flex-1 border border-gray-300 rounded p-3 bg-orange-50 focus:outline-none focus:border-orange-500 focus:bg-white transition"
                                                         >
                                                             {getHourOptions().map(h => <option key={h} value={h}>{h}</option>)}
                                                         </select>
@@ -674,7 +622,7 @@
                                                         <select 
                                                             value={selectedMinute}
                                                             onChange={(e) => setSelectedMinute(parseInt(e.target.value))}
-                                                            className="flex-1 border border-gray-300 rounded p-3 bg-gray-50 focus:outline-none focus:border-blue-500 focus:bg-white transition"
+                                                            className="flex-1 border border-gray-300 rounded p-3 bg-orange-50 focus:outline-none focus:border-orange-500 focus:bg-white transition"
                                                         >
                                                             {getMinuteOptions().map(m => <option key={m} value={m}>{m}</option>)}
                                                         </select>
@@ -685,7 +633,7 @@
                                             <button 
                                                 onClick={handleSubmit}
                                                 disabled={submitting}
-                                                className="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+                                                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold py-3 rounded hover:from-orange-600 hover:to-amber-600 transition transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center shadow-md"
                                             >
                                                 {submitting ? <><i className="fas fa-circle-notch fa-spin mr-2"></i>處理中...</> : <><i className="fas fa-paper-plane mr-2"></i>送出資料</>}
                                             </button>
@@ -697,9 +645,9 @@
                             {/* Right: Display Table */}
                             <div className="md:col-span-8">
                                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                                    <div className="bg-gray-100 px-6 py-4 border-b flex justify-between items-center">
+                                    <div className="bg-gradient-to-r from-orange-100 to-amber-100 px-6 py-4 border-b flex justify-between items-center">
                                         <h3 className="text-lg font-bold text-gray-700">匯款時間</h3>
-                                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">{dataList.length} 筆資料</span>
+                                        <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">{dataList.length} 筆資料</span>
                                     </div>
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left">
@@ -738,19 +686,19 @@
                                                 ) : (
                                                     isAdmin ? (
                                                         adminDisplayList.map(item => (
-                                                            <tr key={item.id} className="hover:bg-blue-50 transition fade-in">
+                                                            <tr key={item.id} className="hover:bg-orange-50 transition fade-in">
                                                                 <td className="px-6 py-4">
                                                                     <input type="checkbox" className="form-checkbox" checked={selectedRows.includes(item.id)} onChange={() => toggleSelect(item.id)} />
                                                                 </td>
-                                                                <td className="px-6 py-4"><span className="inline-block bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm">{item.houseNumber}</span></td>
+                                                                <td className="px-6 py-4"><span className="inline-block bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm">{item.houseNumber}</span></td>
                                                                 <td className="px-6 py-4 text-gray-700 break-words">{item.opinion}</td>
                                                                 <td className="px-6 py-4 text-gray-600 text-sm text-right">{item.updatedAt ? new Date((item.updatedAt.seconds ?? item.updatedAt) * 1000).toLocaleString('zh-TW') : ''}</td>
                                                             </tr>
                                                         ))
                                                     ) : (
                                                         displayList.map(item => (
-                                                            <tr key={item.id} className="hover:bg-blue-50 transition fade-in">
-                                                                <td className="px-6 py-4"><span className="inline-block bg-blue-100 text-blue-800 font-bold px-3 py-1 rounded-full text-sm">{item.houseNumber}</span></td>
+                                                            <tr key={item.id} className="hover:bg-orange-50 transition fade-in">
+                                                                <td className="px-6 py-4"><span className="inline-block bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm">{item.houseNumber}</span></td>
                                                                 <td className="px-6 py-4 text-gray-700 break-words">{item.opinion}</td>
                                                             </tr>
                                                         ))
@@ -759,6 +707,60 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 填寫進度總覽 - 移至前台最後 */}
+                        <div className="mt-8">
+                            <div className="bg-white rounded shadow-lg p-6">
+                                <h3 className="font-bold text-gray-700 mb-4 border-b pb-2">填寫進度總覽</h3>
+                                
+                                <div className="flex justify-center">
+                                    {/* Container for the 3 columns, height is now determined by the house cells */}
+                                    <div className="flex gap-1 p-2 bg-orange-50 rounded-lg border border-orange-200">
+                                        
+                                        {/* Left Column (Odd Numbers) */}
+                                        <div className="w-16 flex flex-col">
+                                            {/* Header (mb-1 matches cell spacing) */}
+                                            <div className="h-8 mb-1 bg-gradient-to-r from-orange-300 to-amber-300 text-gray-700 font-bold flex items-center justify-center rounded text-sm shrink-0">A區</div>
+                                            {/* Cells (default top-to-bottom stacking) */}
+                                            {ODD_HOUSES.map(n => (
+                                                <StatusCell key={`odd-${n}`} houseNum={n} />
+                                            ))}
+                                        </div>
+
+                                        {/* Middle Column (Even Numbers) */}
+                                        <div className="w-16 flex flex-col">
+                                            {/* Header (mb-1 matches cell spacing) */}
+                                            <div className="h-8 mb-1 bg-gradient-to-r from-orange-300 to-amber-300 text-gray-700 font-bold flex items-center justify-center rounded text-sm shrink-0">B區</div>
+                                            {/* Cells (default top-to-bottom stacking) */}
+                                            {EVEN_HOUSES.map(n => (
+                                                <StatusCell key={`even-${n}`} houseNum={n} />
+                                            ))}
+                                        </div>
+
+                                        {/* Right Column (Progress Bar) */}
+                                        <div className="w-20 flex flex-col relative bg-orange-100 rounded overflow-hidden border border-orange-300 mx-1">
+                                            {/* Header Text - stick to top, but inside this flow */}
+                                            <div className="h-8 mb-1 sticky top-0 w-full z-10 flex items-center justify-center font-bold text-gray-800 bg-white/50 backdrop-blur-sm border-b border-orange-300 text-sm shrink-0">
+                                                {progressPercentage}%
+                                            </div>
+                                            
+                                            {/* Background Track - must fill the same total height as the house cells */}
+                                            <div className="relative w-full flex-grow">
+                                                {/* Foreground Fill (Warm gradient) */}
+                                                <div 
+                                                    className="absolute bottom-0 w-full bg-gradient-to-t from-orange-500 to-amber-400 progress-bar-fill shadow-[0_0_10px_rgba(251,146,60,0.5)]"
+                                                    style={{ height: `${progressPercentage}%` }}
+                                                ></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-center mt-3 text-xs text-gray-500">
+                                    <span className="inline-block w-3 h-3 bg-orange-600 rounded mr-1 align-middle"></span>已完成
+                                    <span className="inline-block w-3 h-3 bg-white border border-gray-300 rounded ml-3 mr-1 align-middle"></span>未填寫
                                 </div>
                             </div>
                         </div>
@@ -783,7 +785,7 @@
                                     <input type="email" value={adminUser} onChange={e => setAdminUser(e.target.value)} className="w-full border rounded p-2" placeholder="管理員信箱 (Email)" />
                                     <input type="password" value={adminPass} onChange={e => setAdminPass(e.target.value)} className="w-full border rounded p-2" placeholder="密碼" />
                                     {loginError && <p className="text-red-500 text-sm">{loginError}</p>}
-                                    <button onClick={handleAdminLogin} className="w-full bg-gray-800 text-white py-2 rounded hover:bg-black">安全登入</button>
+                                    <button onClick={handleAdminLogin} className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white py-2 rounded hover:from-orange-600 hover:to-amber-600 transition">安全登入</button>
                                 </div>
                             </div>
                         </div>

@@ -22,18 +22,19 @@ A modern React SPA for tracking community management fee payments.
 3. Run development server: `npm run dev`
 4. Build for production: `npm run build`
 
-### Environment Variables
-Create a `.env` file in the root directory with the following variables:
-```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
-VITE_APP_ID=default-house-app
-VITE_PUBLIC_COLLECTION=house_opinions_v2
+### Multi-Environment Support
+This project uses Vite modes to separate production and test environments:
+- **Production:** Uses `.env.production` (`VITE_APP_ID=manage-fee-prod`)
+- **Testing:** Uses `.env.test` (`VITE_APP_ID=manage-fee-test`)
+
+### Testing
+We use [Playwright](https://playwright.dev/) for end-to-end testing. The tests run against the test environment to avoid data pollution.
+```bash
+# Run tests in headless mode
+npm run test:e2e
+
+# Run tests with UI for debugging
+npx playwright test --ui
 ```
 
 ## Features

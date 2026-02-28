@@ -1,0 +1,143 @@
+import React, { useState } from 'react';
+import { Landmark, ChevronDown, Send, Loader2 } from 'lucide-react';
+import { HOUSE_NUMBERS } from '../utils/constants';
+import { useData } from '../hooks/useData';
+
+const InputForm: React.FC = () => {
+  const { submitPayment } = useData();
+  const [selectedHouse, setSelectedHouse] = useState(HOUSE_NUMBERS[0]);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Time state
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [day, setDay] = useState(new Date().getDate());
+  const [hour, setHour] = useState(new Date().getHours());
+  const [minute, setMinute] = useState(new Date().getMinutes());
+
+  const getMonthOptions = () => {
+    const current = new Date().getMonth() + 1;
+    const last = current === 1 ? 12 : current - 1;
+    return [last, current];
+  };
+
+  const getDayOptions = () => {
+    const current = new Date().getDate();
+    return Array.from({ length: 6 }, (_, i) => current - 5 + i).filter(d => d > 0);
+  };
+
+  const getHourOptions = () => {
+    const current = new Date().getHours();
+    return Array.from({ length: 7 }, (_, i) => current - 6 + i).filter(h => h >= 0);
+  };
+
+  const getMinuteOptions = () => Array.from({ length: 60 }, (_, i) => i);
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const opinion = `${month}月${day}日${hour}時${minute}分`;
+      await submitPayment(selectedHouse, opinion);
+      // Success feedback could be added here
+    } catch (err: any) {
+      alert(`送出失敗: ${err.message}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
+      <div className="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6 rounded shadow-sm">
+        <h3 className="font-bold text-orange-800 mb-1 flex items-center">
+          <Landmark size={18} className="mr-2" />匯款資訊
+        </h3>
+        <div className="text-gray-700 text-sm space-y-1">
+          <p>銀行代碼：<span className="font-mono font-bold">808</span></p>
+          <p>存戶帳號：<span className="font-mono font-bold">0369940012403</span></p>
+        </div>
+      </div>
+
+      <h2 className="text-xl font-bold text-gray-700 mb-6 border-b pb-2">填寫區</h2>
+      <div className="space-y-5">
+        <div>
+          <label className="block text-gray-600 font-medium mb-2">1. 門牌號碼</label>
+          <div className="relative">
+            <select 
+              value={selectedHouse}
+              onChange={(e) => setSelectedHouse(parseInt(e.target.value))}
+              className="w-full border border-gray-300 rounded p-3 appearance-none bg-orange-50 focus:outline-none focus:border-orange-500 focus:bg-white transition"
+            >
+              {HOUSE_NUMBERS.map(n => <option key={n} value={n}>{n} 號</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-3.5 pointer-events-none text-gray-500" size={18} />
+          </div>
+        </div>
+        
+        <div>
+          <label className="block text-gray-600 font-medium mb-2">2. 匯款時間</label>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <select 
+                value={month}
+                onChange={(e) => setMonth(parseInt(e.target.value))}
+                className="flex-1 border border-gray-300 rounded p-3 bg-orange-50"
+              >
+                {getMonthOptions().map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+              <span className="text-gray-600">月</span>
+              
+              <select 
+                value={day}
+                onChange={(e) => setDay(parseInt(e.target.value))}
+                className="flex-1 border border-gray-300 rounded p-3 bg-orange-50"
+              >
+                {getDayOptions().map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+              <span className="text-gray-600">日</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <select 
+                value={hour}
+                onChange={(e) => setHour(parseInt(e.target.value))}
+                className="flex-1 border border-gray-300 rounded p-3 bg-orange-50"
+              >
+                {getHourOptions().map(h => <option key={h} value={h}>{h}</option>)}
+              </select>
+              <span className="text-gray-600">時</span>
+              
+              <select 
+                value={minute}
+                onChange={(e) => setMinute(parseInt(e.target.value))}
+                className="flex-1 border border-gray-300 rounded p-3 bg-orange-50"
+              >
+                {getMinuteOptions().map(m => <option key={m} value={m}>{m}</option>)}
+              </select>
+              <span className="text-gray-600">分</span>
+            </div>
+          </div>
+        </div>
+
+        <button 
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold py-3 rounded hover:from-orange-600 hover:to-amber-600 transition transform active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center shadow-md"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="animate-spin mr-2" size={20} />
+              處理中...
+            </>
+          ) : (
+            <>
+              <Send size={18} className="mr-2" />
+              送出資料
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default InputForm;

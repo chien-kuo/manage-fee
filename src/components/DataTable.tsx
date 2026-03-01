@@ -11,12 +11,11 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const DataTable: React.FC = () => {
-  const { dataList, isLoading, deleteRows } = useData();
+  const { dataList, isLoading, selectedIds, setSelectedIds, deleteRows } = useData();
   const { isAdmin } = useAuthStore();
   
   const [sortKey, setSortKey] = useState<'houseNumber' | 'updatedAt'>('houseNumber');
   const [sortDir, setSortDir] = useState<1 | -1>(1);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const sortedData = useMemo(() => {
     const arr = [...dataList];
@@ -41,7 +40,7 @@ const DataTable: React.FC = () => {
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    setSelectedIds(selectedIds.includes(id) ? selectedIds.filter(x => x !== id) : [...selectedIds, id]);
   };
 
   const toggleSelectAll = () => {
@@ -75,7 +74,7 @@ const DataTable: React.FC = () => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <div className="bg-gradient-to-r from-orange-100 to-amber-100 px-6 py-4 border-b flex justify-between items-center">
-        <h3 className="text-lg font-bold text-gray-700">匯款時間</h3>
+        <h3 className="text-lg font-bold text-gray-700">匯款紀錄</h3>
         <div className="flex items-center gap-3">
           <span className="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">{dataList.length} 筆資料</span>
           {isAdmin && selectedIds.length > 0 && (
@@ -102,18 +101,20 @@ const DataTable: React.FC = () => {
                   />
                 </th>
               )}
-              <th className="px-6 py-3 font-semibold w-1/4">
+              <th className="px-6 py-3 font-semibold w-24">
                 <button onClick={() => toggleSort('houseNumber')} className="flex items-center gap-2">
-                  門牌號碼
+                  門牌
                   <ArrowUpDown size={14} className={cn(sortKey === 'houseNumber' ? "text-orange-500" : "text-gray-400")} />
                 </button>
               </th>
-              <th className="px-6 py-3 font-semibold">內容</th>
+              <th className="px-6 py-3 font-semibold">匯款時間</th>
+              <th className="px-6 py-3 font-semibold">轉帳銀行</th>
+              <th className="px-6 py-3 font-semibold">末五碼</th>
               {isAdmin && (
-                <th className="px-6 py-3 font-semibold w-40">
+                <th className="px-6 py-3 font-semibold w-40 text-right">
                   <button onClick={() => toggleSort('updatedAt')} className="flex items-center gap-2 justify-end w-full">
                     <ArrowUpDown size={14} className={cn(sortKey === 'updatedAt' ? "text-orange-500" : "text-gray-400")} />
-                    最後更新時間
+                    更新時間
                   </button>
                 </th>
               )}
@@ -122,13 +123,13 @@ const DataTable: React.FC = () => {
           <tbody className="divide-y divide-gray-200">
             {sortedData.length === 0 ? (
               <tr>
-                <td colSpan={isAdmin ? 4 : 2} className="px-6 py-12 text-center text-gray-400 bg-gray-50/30">
+                <td colSpan={isAdmin ? 6 : 4} className="px-6 py-12 text-center text-gray-400 bg-gray-50/30">
                   目前尚無資料，請成為第一位填寫者。
                 </td>
               </tr>
             ) : (
               sortedData.map(item => (
-                <tr key={item.id} className="hover:bg-orange-50 transition fade-in">
+                <tr key={item.id} className={cn("hover:bg-orange-50 transition fade-in", item.isReconciled && "bg-blue-50/50")}>
                   {isAdmin && (
                     <td className="px-6 py-4">
                       <input 
@@ -139,14 +140,26 @@ const DataTable: React.FC = () => {
                     </td>
                   )}
                   <td className="px-6 py-4">
-                    <span className="inline-block bg-orange-100 text-orange-800 font-bold px-3 py-1 rounded-full text-sm">
+                    <span className={cn(
+                      "inline-block font-bold px-3 py-1 rounded-full text-sm",
+                      item.isReconciled 
+                        ? "bg-blue-100 text-blue-800" 
+                        : "bg-orange-100 text-orange-800"
+                    )}>
                       {item.houseNumber}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-700 break-words">{item.opinion}</td>
+                  <td className="px-6 py-4 text-gray-700">{item.opinion}</td>
+                  <td className="px-6 py-4 text-gray-700">{item.bankName || '-'}</td>
+                  <td className="px-6 py-4 text-gray-700 font-mono">{item.lastFiveDigits || '-'}</td>
                   {isAdmin && (
                     <td className="px-6 py-4 text-gray-600 text-sm text-right">
-                      {item.updatedAt ? new Date(item.updatedAt.seconds * 1000).toLocaleString('zh-TW') : ''}
+                      {item.updatedAt ? new Date(item.updatedAt.seconds * 1000).toLocaleString('zh-TW', {
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric'
+                      }) : ''}
                     </td>
                   )}
                 </tr>

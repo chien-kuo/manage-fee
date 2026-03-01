@@ -14,6 +14,10 @@ const InputForm: React.FC = () => {
   const [hour, setHour] = useState(new Date().getHours());
   const [minute, setMinute] = useState(new Date().getMinutes());
 
+  // Payment info state
+  const [bankName, setBankName] = useState('');
+  const [lastFiveDigits, setLastFiveDigits] = useState('');
+
   const getMonthOptions = () => {
     const current = new Date().getMonth() + 1;
     const last = current === 1 ? 12 : current - 1;
@@ -36,13 +40,21 @@ const InputForm: React.FC = () => {
     setSubmitting(true);
     try {
       const opinion = `${month}月${day}日${hour}時${minute}分`;
-      await submitPayment(selectedHouse, opinion);
-      // Success feedback could be added here
+      await submitPayment(selectedHouse, opinion, bankName, lastFiveDigits);
+      // Reset form or show success
+      setBankName('');
+      setLastFiveDigits('');
+      alert('資料已成功送出！');
     } catch (err: any) {
       alert(`送出失敗: ${err.message}`);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleLastFiveDigitsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 5);
+    setLastFiveDigits(value);
   };
 
   return (
@@ -115,6 +127,27 @@ const InputForm: React.FC = () => {
               </select>
               <span className="text-gray-600">分</span>
             </div>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-gray-600 font-medium mb-2">3. 匯款資訊</label>
+          <div className="space-y-3">
+            <input 
+              type="text"
+              placeholder="轉帳銀行 (例如：玉山銀行)"
+              value={bankName}
+              onChange={(e) => setBankName(e.target.value)}
+              className="w-full border border-gray-300 rounded p-3 bg-orange-50 focus:outline-none focus:border-orange-500 focus:bg-white transition"
+            />
+            <input 
+              type="text"
+              inputMode="numeric"
+              placeholder="末五碼 (請輸入 5 位數字)"
+              value={lastFiveDigits}
+              onChange={handleLastFiveDigitsChange}
+              className="w-full border border-gray-300 rounded p-3 bg-orange-50 focus:outline-none focus:border-orange-500 focus:bg-white transition"
+            />
           </div>
         </div>
 

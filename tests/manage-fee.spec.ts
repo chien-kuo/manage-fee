@@ -37,8 +37,8 @@ test.describe('管理費匯整 E2E 測試', () => {
     await page.getByRole('button', { name: '管理者後台' }).click();
     await expect(page.getByText('登入後台')).toBeVisible();
 
-    await page.getByPlaceholder('example@mail.com').fill('cksu.orz@gmail.com');
-    await page.getByPlaceholder('••••••••').fill('RU%7pjjcAQ@1N^');
+    await page.getByPlaceholder('example@mail.com').fill(process.env.VITE_TEST_ADMIN_EMAIL || '');
+    await page.getByPlaceholder('••••••••').fill(process.env.VITE_TEST_ADMIN_PASSWORD || '');
     await page.getByRole('button', { name: '安全登入' }).click();
     
     // 檢查是否有錯誤訊息

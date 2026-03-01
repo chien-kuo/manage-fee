@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { Settings, FileSpreadsheet, FileText, Trash2, Loader2 } from 'lucide-react';
+import { Settings, FileSpreadsheet, FileText, Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { useData } from '../hooks/useData';
 import { useAuthStore } from '../store/useAuthStore';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 const AdminToolbar: React.FC = () => {
-  const { dataList, clearAllData } = useData();
+  const { dataList, selectedIds, clearAllData, markAsReconciled, setSelectedIds } = useData();
   const { user } = useAuthStore();
   const [exporting, setExporting] = useState(false);
+  const [reconciling, setReconciling] = useState(false);
 
   const handleExportCSV = () => {
-    const headers = ["門牌號碼,匯款時間,最後更新時間"];
+    const headers = ["門牌號碼,匯款時間,轉帳銀行,末五碼,已對帳,最後更新時間"];
     const rows = dataList.map(row => {
       const time = row.updatedAt ? new Date(row.updatedAt.seconds * 1000).toLocaleString('zh-TW') : '';
       const safeOpinion = `"${row.opinion.replace(/"/g, '""')}"`;
-      return `${row.houseNumber},${safeOpinion},${time}`;
+      const safeBankName = `"${(row.bankName || '').replace(/"/g, '""')}"`;
+      return `${row.houseNumber},${safeOpinion},${safeBankName},${row.lastFiveDigits || ''},${row.isReconciled ? '是' : '否'},${time}`;
     });
     const csvContent = "\uFEFF" + [headers, ...rows].join('\n'); 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -24,6 +26,20 @@ const AdminToolbar: React.FC = () => {
     link.href = url;
     link.download = `payment_export_${new Date().getTime()}.csv`;
     link.click();
+  };
+
+  const handleMarkAsReconciled = async () => {
+    if (selectedIds.length === 0) return;
+    setReconciling(true);
+    try {
+      await markAsReconciled(selectedIds);
+      setSelectedIds([]);
+      alert("已成功更新對帳狀態");
+    } catch (err: any) {
+      alert("更新失敗：" + err.message);
+    } finally {
+      setReconciling(false);
+    }
   };
 
   const handleExportPDF = async () => {
@@ -102,6 +118,17 @@ const AdminToolbar: React.FC = () => {
         後台操作 ({user?.email})
       </h2>
       <div className="flex gap-3">
+        {selectedIds.length > 0 && (
+          <button
+            onClick={handleMarkAsReconciled}
+            disabled={reconciling}
+            className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-50 shadow flex items-center transition-all animate-in zoom-in"
+            title="標記為已對帳"
+          >
+            {reconciling ? <Loader2 className="animate-spin" size={20} /> : <CheckCircle size={20} />}
+          </button>
+        )}
+
         <button
           onClick={handleExportCSV}
           disabled={dataList.length === 0}

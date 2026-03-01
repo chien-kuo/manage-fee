@@ -16,7 +16,16 @@ import { useDataStore, PaymentData } from '../store/useDataStore';
 import { useAuthStore } from '../store/useAuthStore';
 
 export const useData = () => {
-  const { dataList, isLoading, errorMsg, setDataList, setLoading, setErrorMsg } = useDataStore();
+  const { 
+    dataList, 
+    isLoading, 
+    errorMsg, 
+    selectedIds, 
+    setDataList, 
+    setLoading, 
+    setErrorMsg, 
+    setSelectedIds 
+  } = useDataStore();
   const { user } = useAuthStore();
 
   const getCollectionRef = () => {
@@ -45,7 +54,7 @@ export const useData = () => {
     return () => unsubscribe();
   }, [user, setDataList, setLoading, setErrorMsg]);
 
-  const submitPayment = async (houseNumber: number, opinion: string) => {
+  const submitPayment = async (houseNumber: number, opinion: string, bankName: string, lastFiveDigits: string) => {
     if (!user) throw new Error("尚未登入");
     
     const docId = `house_${houseNumber}`;
@@ -54,6 +63,9 @@ export const useData = () => {
     await setDoc(docRef, {
       houseNumber,
       opinion,
+      bankName,
+      lastFiveDigits,
+      isReconciled: false,
       updatedAt: serverTimestamp(),
       updatedBy: user.uid
     });
@@ -76,5 +88,35 @@ export const useData = () => {
     await batch.commit();
   };
 
-  return { dataList, isLoading, errorMsg, submitPayment, clearAllData, deleteRows };
+  const markAsReconciled = async (ids: string[]) => {
+    if (ids.length === 0) return;
+    
+    const batch = writeBatch(db);
+    // 取得目前選中項目的資料狀態
+    const selectedItems = dataList.filter(item => ids.includes(item.id));
+    
+    // 邏輯：只要選中的項目中，有任何一個是「未對帳」(false 或 undefined)，
+    // 則這次操作的目標就是將選中的全部設為「已對帳」(true)。
+    // 只有當選中的項目「全部」都已經是「已對帳」時，才會全部切換回「未對帳」。
+    const hasUnreconciled = selectedItems.some(item => !item.isReconciled);
+    const targetStatus = hasUnreconciled;
+
+    ids.forEach(id => {
+      const docRef = doc(getCollectionRef(), id);
+      batch.update(docRef, { isReconciled: targetStatus });
+    });
+    await batch.commit();
+  };
+
+  return { 
+    dataList, 
+    isLoading, 
+    errorMsg, 
+    selectedIds, 
+    submitPayment, 
+    clearAllData, 
+    deleteRows, 
+    markAsReconciled,
+    setSelectedIds 
+  };
 };

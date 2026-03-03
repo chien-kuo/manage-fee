@@ -14,7 +14,7 @@ const DataTable: React.FC = () => {
   const { dataList, isLoading, selectedIds, setSelectedIds, deleteRows } = useData();
   const { isAdmin } = useAuthStore();
   
-  const [sortKey, setSortKey] = useState<'houseNumber' | 'updatedAt'>('houseNumber');
+  const [sortKey, setSortKey] = useState<'houseNumber' | 'updatedAt' | 'opinion'>('houseNumber');
   const [sortDir, setSortDir] = useState<1 | -1>(1);
 
   const sortedData = useMemo(() => {
@@ -23,18 +23,34 @@ const DataTable: React.FC = () => {
       if (sortKey === 'houseNumber') {
         return (a.houseNumber - b.houseNumber) * sortDir;
       }
-      const aTime = a.updatedAt?.seconds || 0;
-      const bTime = b.updatedAt?.seconds || 0;
-      return (aTime - bTime) * sortDir;
+      if (sortKey === 'updatedAt') {
+        const aTime = a.updatedAt?.seconds || 0;
+        const bTime = b.updatedAt?.seconds || 0;
+        return (aTime - bTime) * sortDir;
+      }
+      if (sortKey === 'opinion') {
+        // 解析 "X月Y日H時M分" 進行比較
+        const parseTime = (s: string) => {
+          const matches = s.match(/(\d+)月(\d+)日(\d+)時(\d+)分/);
+          if (!matches) return 0;
+          const [_, m, d, h, min] = matches.map(Number);
+          // 簡單處理跨年：如果月份大於目前月份太多，視為前一年（雖然這裏主要用於排序）
+          // 但最簡單的是直接轉成數字：月*1000000 + 日*10000 + 時*100 + 分
+          return m * 1000000 + d * 10000 + h * 100 + min;
+        };
+        return (parseTime(a.opinion) - parseTime(b.opinion)) * sortDir;
+      }
+      return 0;
     });
     return arr;
   }, [dataList, sortKey, sortDir]);
 
-  const toggleSort = (key: 'houseNumber' | 'updatedAt') => {
+  const toggleSort = (key: 'houseNumber' | 'updatedAt' | 'opinion') => {
     if (sortKey === key) {
       setSortDir(prev => (prev === 1 ? -1 : 1));
     } else {
       setSortKey(key);
+      // 門牌預設遞增，時間類預設遞減（最新的在前）
       setSortDir(key === 'houseNumber' ? 1 : -1);
     }
   };
@@ -107,7 +123,12 @@ const DataTable: React.FC = () => {
                   <ArrowUpDown size={14} className={cn(sortKey === 'houseNumber' ? "text-orange-500" : "text-gray-400")} />
                 </button>
               </th>
-              <th className="px-6 py-3 font-semibold">匯款時間</th>
+              <th className="px-6 py-3 font-semibold">
+                <button onClick={() => toggleSort('opinion')} className="flex items-center gap-2">
+                  匯款時間
+                  <ArrowUpDown size={14} className={cn(sortKey === 'opinion' ? "text-orange-500" : "text-gray-400")} />
+                </button>
+              </th>
               <th className="px-6 py-3 font-semibold">轉帳銀行</th>
               <th className="px-6 py-3 font-semibold">末五碼</th>
               {isAdmin && (

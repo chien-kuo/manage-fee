@@ -1,13 +1,14 @@
 # GEMINI.md: Manage Fee Project Profile
 
-## 🤖 Current Project Context (2026-03-01)
+## 🤖 Current Project Context (2026-03-03)
 - **Project Name:** Manage Fee (管理費匯整)
-- **Status:** Feature Implementation & Security Refactoring Complete. E2E Testing Environment verified.
+- **Status:** Enhanced time selection and cross-month backfill support implemented.
 - **Tech Stack:** React 19, Vite 7, Tailwind CSS v4, Zustand, Firebase (Modular SDK), Playwright.
 - **New Features:** 
   - Added `bankName` and `lastFiveDigits` fields to payment records.
   - Implemented Admin Reconciliation (已對帳) toggle with multi-select support.
   - Visual sync: Reconciled status displayed in Blue in `ProgressOverview`.
+  - **Enhanced Time Selection:** Supports 0-24h selection and intelligent cross-month backfill (auto-validates dates when switching months).
 
 ## 🏗 Architectural Mandates
 1. **Service Layer (`src/services/`):** Firebase initialization using Vite environment variables.
@@ -44,8 +45,7 @@
 ## 💡 Resume Context Prompt (For next session)
 "Hi Gemini, please resume work on the Manage Fee project.
 The project is a React 19 SPA following the Service-Hook-UI pattern.
-- New Features: Bank info fields (bankName, lastFiveDigits) and Admin reconciliation toggle.
+- Latest Features: Enhanced time selection (0-24h) and cross-month backfill support.
 - UI Logic: Completed units are Orange, Reconciled units are Blue.
-- Security: Test credentials moved to environment variables.
-- Testing: Verified with Playwright E2E tests.
-Please analyze `src/hooks/useData.ts`, `src/components/ProgressOverview.tsx`, and `tests/manage-fee.spec.ts` to understand the latest reconciliation logic and testing setup before we proceed."
+- Testing: Verified with Playwright E2E tests and manual time selection checks.
+Please analyze `src/components/InputForm.tsx` to understand the latest date/time validation logic before we proceed."

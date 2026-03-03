@@ -39,6 +39,7 @@ npx playwright test --ui
 
 ## Features
 - Real-time payment tracking.
-- Progress visualization by zones.
+- Progress visualization by zones (Orange for completed, Blue for reconciled).
+- Enhanced time selection with 0-24h options and cross-month backfill support.
 - Admin dashboard with CSV/PDF export and data management.
 - Secure authentication (Anonymous for users, Email/Password for Admin).

@@ -25,14 +25,39 @@ const InputForm: React.FC = () => {
   };
 
   const getDayOptions = () => {
-    const current = new Date().getDate();
-    return Array.from({ length: 6 }, (_, i) => current - 5 + i).filter(d => d > 0);
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    
+    // 取得選中月份的最大天數
+    const targetYear = (currentMonth === 1 && month === 12) ? currentYear - 1 : currentYear;
+    const lastDayOfMonth = new Date(targetYear, month, 0).getDate();
+    
+    if (month === currentMonth) {
+      // 當月：顯示 1 號到今天
+      return Array.from({ length: now.getDate() }, (_, i) => i + 1);
+    } else {
+      // 往月：顯示該月完整天數
+      return Array.from({ length: lastDayOfMonth }, (_, i) => i + 1);
+    }
   };
 
-  const getHourOptions = () => {
-    const current = new Date().getHours();
-    return Array.from({ length: 7 }, (_, i) => current - 6 + i).filter(h => h >= 0);
+  const handleMonthChange = (newMonth: number) => {
+    setMonth(newMonth);
+    
+    // 檢查日期合法性：如果從 3/31 切換到 2 月，自動修正日期為 2/28 或 2/29
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    const targetYear = (currentMonth === 1 && newMonth === 12) ? currentYear - 1 : currentYear;
+    const lastDayOfNewMonth = new Date(targetYear, newMonth, 0).getDate();
+    
+    if (day > lastDayOfNewMonth) {
+      setDay(lastDayOfNewMonth);
+    }
   };
+
+  const getHourOptions = () => Array.from({ length: 24 }, (_, i) => i);
 
   const getMinuteOptions = () => Array.from({ length: 60 }, (_, i) => i);
 
@@ -91,7 +116,7 @@ const InputForm: React.FC = () => {
             <div className="flex items-center gap-2">
               <select 
                 value={month}
-                onChange={(e) => setMonth(parseInt(e.target.value))}
+                onChange={(e) => handleMonthChange(parseInt(e.target.value))}
                 className="flex-1 border border-gray-300 rounded p-3 bg-orange-50"
               >
                 {getMonthOptions().map(m => <option key={m} value={m}>{m}</option>)}
